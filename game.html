@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Orleans Market, 1815</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: a broadside masthead over a two-column counting-house desk.
+   Left column is the ledger (price chart, dispatches, books).
+   Right column is the counter where the person in front of you waits for an answer. */
+:root{
+  --paper:#E4D8B8; --paper-2:#D8CAA3; --panel:#EDE4CB; --ink:#241C14; --ink-2:#5A4C3A;
+  --rule:#B3A27A; --seal:#8A2B25; --seal-ink:#F3E6D0; --good:#2D5A45; --warn:#8F5F0C;
+  --bad:#8A2B25; --focus:#1F4E79; --veil:rgba(36,28,20,.55);
+  --f-display:'IM Fell English','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  --f-body:'Crimson Pro','Iowan Old Style',Georgia,serif;
+  --f-data:'Courier Prime','Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1B1712; --paper-2:#251F18; --panel:#2A231B; --ink:#EADFC4; --ink-2:#B8A98A;
+    --rule:#4D4130; --seal:#B3453A; --good:#6FB08F; --warn:#D9A441; --bad:#E0766A; --focus:#7FB2E5;
+    --veil:rgba(0,0,0,.65); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1B1712; --paper-2:#251F18; --panel:#2A231B; --ink:#EADFC4; --ink-2:#B8A98A;
+  --rule:#4D4130; --seal:#B3453A; --good:#6FB08F; --warn:#D9A441; --bad:#E0766A; --focus:#7FB2E5;
+  --veil:rgba(0,0,0,.65); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.5;
+  padding-inline:16px;padding-block:0 40px}
+.wrap{max-width:1180px;margin-inline:auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0 0 .8em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.mono,.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.label{font-family:var(--f-data);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.muted{color:var(--ink-2)}
+
+/* masthead */
+.mast{display:flex;gap:16px;align-items:center;padding-block:18px 12px;border-bottom:3px double var(--ink);flex-wrap:wrap}
+.mast .seal{flex:none;width:58px;height:58px}
+.mast .name{flex:1 1 280px;min-width:0}
+.mast h1{font-size:clamp(1.7rem,4.6vw,2.7rem);letter-spacing:.01em}
+.mast .sub{font-family:var(--f-data);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-top:4px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tbtn{background:none;border:1px solid var(--rule);padding:6px 12px;border-radius:2px;font-family:var(--f-data);font-size:.78rem;letter-spacing:.06em}
+.tbtn:hover{border-color:var(--ink)}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+/* generic parts */
+.panel{background:var(--panel);border:1px solid var(--rule);padding:16px;min-width:0}
+.panel>h2,.panel>h3{margin-bottom:10px}
+.btn{display:inline-block;background:none;border:1.5px solid var(--ink);padding:9px 18px;border-radius:2px;font-family:var(--f-data);font-size:.86rem;letter-spacing:.05em}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.primary{background:var(--seal);border-color:var(--seal);color:var(--seal-ink)}
+.btn.primary:hover{filter:brightness(1.12);color:var(--seal-ink)}
+.btn.ghost{border-color:var(--rule);color:var(--ink-2)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-block;font-family:var(--f-data);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);padding:1px 8px;color:var(--ink-2)}
+.chip.fict{border-style:dashed}
+.term{background:none;border:0;border-bottom:1px dotted var(--ink-2);padding:0;color:inherit;font:inherit;cursor:help}
+#tip{position:fixed;z-index:60;max-width:300px;background:var(--ink);color:var(--paper);padding:9px 12px;font-size:.92rem;line-height:1.35;border-radius:2px;pointer-events:none}
+
+/* title screen */
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;padding-block:28px}
+.hero h2{font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:14px}
+.hero .intro{font-size:1.1rem;max-width:62ch}
+.diffs{display:grid;gap:10px;margin-block:14px}
+.diff{display:block;text-align:left;width:100%;background:none;border:1px solid var(--rule);padding:10px 14px;border-radius:2px}
+.diff[aria-checked="true"]{border-color:var(--ink);background:var(--paper-2);box-shadow:inset 4px 0 0 var(--seal)}
+.diff b{font-family:var(--f-display);font-weight:400;font-size:1.15rem}
+.handbill{border:1px solid var(--ink);padding:18px;background:var(--panel);align-self:start}
+.handbill h3{font-size:1.5rem;text-align:center;border-bottom:1px solid var(--ink);padding-bottom:8px;margin-bottom:10px}
+.handbill ul{margin:0;padding-left:1.1em}
+.handbill li{margin-bottom:6px}
+
+/* market */
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;padding-top:18px;align-items:start}
+.col{display:grid;gap:18px;min-width:0}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+.stat .v{font-family:var(--f-data);font-size:1.25rem;font-variant-numeric:tabular-nums}
+.meter{height:9px;background:var(--paper-2);border:1px solid var(--rule);margin-top:5px;position:relative}
+.meter i{display:block;height:100%;background:var(--good);transition:width .5s}
+.meter.risk i{background:var(--good)}
+.meter.risk.mid i{background:var(--warn)}
+.meter.risk.high i{background:var(--bad)}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--f-data);font-size:11px;fill:var(--ink-2)}
+.chart .grid-l{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4}
+.chart .pub{fill:none;stroke:var(--ink);stroke-width:2.2}
+.chart .inf{fill:none;stroke:var(--seal);stroke-width:2;stroke-dasharray:6 4}
+.chart .dot{fill:var(--ink)}
+.chart .dot-inf{fill:var(--seal)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--f-data);font-size:.74rem;color:var(--ink-2);margin-top:4px}
+.legend span::before{content:"";display:inline-block;width:22px;border-top:2px solid var(--ink);vertical-align:middle;margin-right:6px}
+.legend .l2::before{border-top:2px dashed var(--seal)}
+.news{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.news li{padding:8px 0 8px 12px;border-left:3px solid var(--rule);font-size:1rem}
+.news li.priv{border-left-color:var(--seal);background:var(--paper-2);padding-right:10px}
+.news li.fresh{animation:fresh 1.2s ease-out}
+@keyframes fresh{from{background:var(--paper-2)}to{background:transparent}}
+.news .when{font-family:var(--f-data);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);display:block}
+.news li.priv .when{color:var(--seal)}
+
+/* counter */
+.npc{display:flex;gap:12px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
+.npc h2{font-size:1.5rem}
+.quote{border-left:3px solid var(--ink);padding:2px 0 2px 14px;margin:10px 0 14px;font-style:italic;font-size:1.1rem}
+.terms{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:1rem}
+.terms th{font-weight:400;text-align:left;color:var(--ink-2);padding:5px 0;border-bottom:1px solid var(--rule)}
+.terms td{text-align:right;padding:5px 0;border-bottom:1px solid var(--rule);font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.qty{display:inline-flex;align-items:center;gap:6px}
+.qty button{width:32px;height:32px;border:1px solid var(--ink);background:none;border-radius:2px;font-family:var(--f-data)}
+.qty button:hover{background:var(--ink);color:var(--paper)}
+.qty output{min-width:2.4ch;text-align:center}
+.secret{border:1px dashed var(--seal);padding:10px 12px;margin-bottom:12px;background:var(--paper-2)}
+.secret b{color:var(--seal)}
+.ask{font-family:var(--f-display);font-size:1.15rem;margin:6px 0 10px}
+.choices{display:grid;gap:8px}
+.choice{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;background:none;border:1px solid var(--ink);padding:10px 12px;border-radius:2px}
+.choice:hover{background:var(--paper-2)}
+.choice .k{font-family:var(--f-data);font-size:.8rem;border:1px solid var(--ink-2);width:1.8rem;height:1.8rem;display:grid;place-items:center}
+.choice b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.1rem;line-height:1.2}
+.choice small{display:block;color:var(--ink-2);font-size:.92rem;line-height:1.3;margin-top:2px}
+.choice .tag{font-family:var(--f-data);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.tag.safe{color:var(--good)}.tag.low{color:var(--warn)}.tag.high,.tag.vhigh{color:var(--bad)}
+.advice{border-left:3px solid var(--good);padding:8px 12px;margin:10px 0;background:var(--paper-2);font-size:1rem}
+.foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+
+/* dialogs */
+#veil{position:fixed;inset:0;background:var(--veil);display:grid;place-items:center;padding:16px;z-index:50}
+.dlg{background:var(--panel);border:1px solid var(--ink);max-width:660px;width:100%;max-height:calc(100% - 8px);overflow:auto;padding:22px 24px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.dlg h2{font-size:1.7rem;margin-bottom:10px}
+.dlg h3{font-size:1.2rem;margin:16px 0 4px}
+.dlg .cite{font-family:var(--f-data);font-size:.76rem;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:8px;margin-top:12px}
+.rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:1rem;margin:8px 0}
+.rec dt{font-family:var(--f-data);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding-top:3px}
+.rec dd{margin:0}
+.verdict{border:2px solid var(--ink);padding:12px 14px;margin:12px 0;font-family:var(--f-display);font-size:1.3rem;text-align:center}
+.verdict.won{border-color:var(--good);color:var(--good)}
+.verdict.lost{border-color:var(--bad);color:var(--bad)}
+.tbl{width:100%;border-collapse:collapse;font-size:.98rem}
+.tbl th,.tbl td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{font-family:var(--f-data);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);font-weight:400}
+.scroll-x{overflow-x:auto}
+.big{font-family:var(--f-display);font-size:clamp(2rem,6vw,3.2rem);line-height:1.1}
+.cols2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.opt{border:1px solid var(--rule);padding:12px 14px;margin:8px 0}
+.opt.right{border-color:var(--good)}
+.opt.wrong{border-color:var(--bad)}
+
+@media (max-width:860px){
+  .hero,.grid,.cols2{grid-template-columns:minmax(0,1fr)}
+  .choice{grid-template-columns:auto minmax(0,1fr)}
+  .choice .tag{grid-column:2;justify-self:start}
+  body{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.portrait{width:84px;height:84px;flex:none;border-radius:50%;border:2px solid var(--rule)}
+.arrive{animation:arrive .5s ease-out}@keyframes arrive{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+.tick.up{animation:fup 1s}.tick.dn{animation:fdn 1s}
+@keyframes fup{0%,60%{background:var(--good);color:var(--paper)}}@keyframes fdn{0%,60%{background:var(--bad);color:var(--paper)}}
+.verdict{animation:gavel .45s}@keyframes gavel{0%{transform:scale(1.25) rotate(-3deg)}60%{transform:scale(.96)}100%{transform:none}}
+.mp{display:flex;gap:14px;align-items:center}
+.mp input,.mp textarea{font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--rule);padding:8px;border-radius:2px}
+.card{white-space:pre-wrap;font-family:var(--f-data);width:100%;min-height:110px}
+@media (prefers-reduced-motion:reduce){.arrive,.tick,.verdict{animation:none!important}}
+</style>
+</head><body>
+<div class="wrap">
+  <header class="mast">
+    <svg class="seal" viewBox="0 0 64 64" role="img" aria-label="Wax seal">
+      <circle cx="32" cy="32" r="29" fill="var(--seal)"/>
+      <circle cx="32" cy="32" r="23" fill="none" stroke="var(--seal-ink)" stroke-width="1.5" stroke-dasharray="2 3"/>
+      <text x="32" y="38" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="20" fill="var(--seal-ink)">NO</text>
+    </svg>
+    <div class="name">
+      <h1>New Orleans Market, 1815</h1>
+      <div class="sub" id="sub">Price Current and Intelligence · A game on Laidlaw v. Organ</div>
+    </div>
+    <div class="tools">
+      <button class="tbtn" data-act="howto">How to play</button>
+      <button class="tbtn" data-act="thennow">Then vs. now</button>
+      <button class="tbtn" data-act="sound" id="soundBtn" aria-pressed="false">Sound off</button>
+      <button class="tbtn" data-act="haptics" id="hapBtn" aria-pressed="false" hidden>Haptics off</button>
+    </div>
+  </header>
+  <main id="screen" aria-live="polite"></main>
+  <p class="muted" style="margin-top:28px;font-size:.9rem;max-width:80ch">An educational game. Characters and events other than those in the reported case are fictional. Legal points are general and simplified, and are not legal advice. Source: Laidlaw v. Organ, 15 U.S. (2 Wheat.) 178 (1817).</p>
+</div>
+<div id="veil" hidden></div>
+<div id="tip" role="tooltip" hidden></div>
+<script>
+(function(){
+"use strict";
+/* =========================================================
+   1. DATA
+   ========================================================= */
+const BASE_PRICE = 68;        // dollars per hogshead; the bill of parcels in the case works out to about $68 ($7,544.69 / 111)
+const START_CASH = 12000;
+const START_INV = 20;
+const TOTAL_ROUNDS = 12;      // 3 days x 4 slots
+const SLOTS = ['Dawn', 'Forenoon', 'Afternoon', 'Evening'];
+const DAYS = [
+  { name: 'Saturday', date: '18 February' },
+  { name: 'Sunday',   date: '19 February' },
+  { name: 'Monday',   date: '20 February' }
+];
+
+/* Difficulty. ask = chance a counterparty puts a question to you; ambiguous = chance that question is vague. */
+const DIFF = {
+  learner:   { label: 'Learner',   blurb: 'Counsel advises you on every move and each answer shows its legal risk.', ask: 0.65, ambiguous: 0,    defect: 0,    suitMult: 0.9, advice: 'auto',   adviceCost: 0,   adviceMax: 999 },
+  trader:    { label: 'Trader',    blurb: 'Counsel can be hired for $40 a time. Risk labels are hidden. Some goods carry faults.', ask: 0.5, ambiguous: 0.25, defect: 0.15, suitMult: 1,   advice: 'button', adviceCost: 40,  adviceMax: 999 },
+  barrister: { label: 'Barrister', blurb: 'Two consultations at $100 each. Vague questions, sharper opponents, more faulty goods.', ask: 0.45, ambiguous: 0.5,  defect: 0.25, suitMult: 1.1, advice: 'button', adviceCost: 100, adviceMax: 2 }
+};
+
+/* Imposition risk and the chance a jury finds imposition, by what the player did. */
+const CONDUCT = {
+  plain:     { label: 'Plain dealing (nothing to hide)', risk: 0,  base: 0,    tag: 'safe' },
+  disclosed: { label: 'Disclosed the news',               risk: 0,  base: 0,    tag: 'safe' },
+  silent:    { label: 'Stayed silent, not asked',         risk: 1,  base: 0,    tag: 'safe' },
+  declined:  { label: 'Declined to answer a question',    risk: 8,  base: 0.12, tag: 'low' },
+  evasive:   { label: 'Misleading or evasive statement',  risk: 30, base: 0.50, tag: 'high' },
+  lie:       { label: 'Outright lie',                     risk: 60, base: 0.75, tag: 'vhigh' }
+};
+const DEFECT_BASE = { silent: 0.35, declined: 0.5, evasive: 0.7, lie: 0.9, disclosed: 0, plain: 0 };
+const DEFECT_RISK = { silent: 15, declined: 25, evasive: 40, lie: 65, disclosed: 0, plain: 0 };
+const TAGTXT = { safe: 'Protected', low: 'Low risk', high: 'High risk', vhigh: 'Very high risk' };
+
+/* Hover and tap definitions. Use [[term]] inside any game text. */
+const GLOSSARY = {
+  'vendee': 'The buyer in a sale. Organ was the vendee in Laidlaw v. Organ.',
+  'vendor': 'The seller. Laidlaw & Co. were the vendors.',
+  'caveat emptor': 'Latin for "let the buyer beware". A buyer looks after their own interests. Laidlaw is often cited alongside it, though the Court also said neither side may do anything tending to impose on the other.',
+  'extrinsic information': 'Facts outside the goods themselves that move their price, such as news of peace, a new duty or a failed crop. The rule in Laidlaw covers this kind of information.',
+  'imposition': 'The Court\'s word for deceiving or misleading the other party. Silence alone is not imposition. Saying or doing something that tends to mislead can be.',
+  'directed verdict': 'An instruction from the judge telling the jury which side must win. The trial judge did this in Laidlaw. The Supreme Court held it was wrong because imposition was a question for the jury.',
+  'hogshead': 'A large cask. In the case, 111 hogsheads of tobacco weighed 120,715 pounds, so each held about 1,090 pounds.',
+  'commission merchant': 'An agent who buys and sells goods in their own name for the account of others. Laidlaw & Co. were commission merchants.',
+  'venire de novo': 'An order for a new trial before a fresh jury. This is what the Supreme Court awarded.',
+  'writ of error': 'The old way of asking a higher court to review a trial court\'s legal mistake. Laidlaw & Co. used it to reach the Supreme Court.',
+  'bill of parcels': 'An itemised invoice of goods sold. The one in the case read 111 hogsheads, 120,715 pounds net, $7,544.69.',
+  'fiduciary': 'A person who owes duties of loyalty and disclosure to another, such as a trustee, or an agent toward the principal.',
+  'latent defect': 'A fault in goods that a buyer cannot see on ordinary inspection.',
+  'rescission': 'Cancelling a contract and putting both sides back where they started.'
+};
+
+/* Events. 'peace' is the one from the case. All others are invented for the game. */
+const PEACE = {
+  id: 'peace', kind: 'key',
+  head: 'Treaty of peace signed at Ghent, British and American commissioners agreed',
+  priv: 'A letter from the British fleet, passed to you in confidence: a treaty of peace has been signed at Ghent.',
+  note: 'This is the news from the real case. When and how it reaches you in this game is invented.'
+};
+const EVENT_POOL = [
+  { id: 'blockade', head: 'British squadron draws off from the Balize, the river mouth lies open', priv: 'A pilot tells you the squadron is leaving the river mouth tonight.', pct: 0.12 },
+  { id: 'ships',    head: 'Three ships cleared for Liverpool, all asking for tobacco freight',   priv: 'A shipping agent whispers that three vessels will soon bid for leaf.', pct: 0.10 },
+  { id: 'fire',     head: 'Fire on Gravier Street destroys a warehouse of leaf',                 priv: 'A watchman tells you a warehouse of leaf burned an hour ago, and few know it.', pct: 0.08 },
+  { id: 'bumper',   head: 'Flatboats arrive with a heavy upriver crop, the levee is crowded',   priv: 'A boatman says a fleet of flatboats ties up tomorrow, loaded with leaf.', pct: -0.14 },
+  { id: 'duty',     head: 'Customs house posts a higher duty on tobacco leaving the port',      priv: 'A clerk at the customs house lets slip that a higher export duty will be posted.', pct: -0.10 }
+];
+const RUMORS = [
+  { head: 'Talk on the levee: factors in Natchez hold back their leaf', pct: 0.03 },
+  { head: 'Talk on the levee: a Kentucky firm is selling in haste',    pct: -0.03 },
+  { head: 'Coffee-house gossip: buyers from Havana are expected',       pct: 0.03 },
+  { head: 'Coffee-house gossip: a rumour of fever at the lower wharves', pct: -0.03 }
+];
+
+/* Fictional counterparties. pers: trusting | shrewd | suspicious. */
+const NPCS = [
+  { id: 'fontenot', name: 'Mme. Adélaïde Fontenot', title: 'Planter\'s agent',        pers: 'trusting',   lines: { sell: 'I have {qty} hogsheads in the shed and a boat to meet. Would $%P a hogshead suit you?', buy: 'My master wants {qty} hogsheads for the Liverpool trade. I can pay $%P each.' } },
+  { id: 'pell',     name: 'Capt. Josiah Pell',      title: 'Flatboat master',         pers: 'suspicious', lines: { sell: 'I will not sit on {qty} hogsheads. $%P each, and I count my money twice.', buy: 'I carry cash for {qty} hogsheads at $%P. Say yes or I walk to the next stall.' } },
+  { id: 'whitlock', name: 'Mr. Ezra Whitlock',      title: 'Philadelphia commission agent', pers: 'shrewd', lines: { sell: 'I can part with {qty} hogsheads at $%P. Firm figure, I am told.', buy: 'My house will take {qty} hogsheads at $%P. We pay promptly, and we read faces.' } },
+  { id: 'varela',   name: 'Don Ignacio Varela',     title: 'Havana buyer',            pers: 'shrewd',     lines: { sell: 'Cargo space is dear. I offer {qty} hogsheads at $%P.', buy: 'Havana wants {qty} hogsheads. I offer $%P, in good bills.' } },
+  { id: 'crane',    name: 'Mr. Thaddeus Crane',     title: 'Clerk turned speculator', pers: 'trusting',   lines: { sell: 'I took on {qty} hogsheads and lost my nerve. $%P and they are yours.', buy: 'I want {qty} hogsheads before the week is out. $%P is my limit.' } },
+  { id: 'bertrand', name: 'Widow Bertrand',         title: 'Warehouse keeper',        pers: 'suspicious', lines: { sell: 'My storage is full. {qty} hogsheads at $%P, and no haggling.', buy: 'I will buy {qty} hogsheads for the new shed at $%P. I have been cheated before.' } },
+  { id: 'dale',     name: 'Mr. Cyrus Dale',         title: 'Kentucky tobacco factor', pers: 'trusting',   lines: { sell: 'Come down from the hills with {qty} hogsheads. $%P, friend.', buy: 'I need {qty} hogsheads to finish a contract. $%P a cask.' } },
+  { id: 'marchand', name: 'Mlle. Odile Marchand',   title: 'Ship chandler',           pers: 'shrewd',     lines: { sell: 'A captain left me {qty} hogsheads against a debt. $%P.', buy: 'A captain wants {qty} hogsheads for his hold. I offer $%P.' } }
+];
+const NPCBY = Object.fromEntries(NPCS.map(n => [n.id, n]));
+const PERS_ASK = { trusting: 0.8, shrewd: 1.0, suspicious: 1.2 };
+const PERS_SUE = { trusting: 0.35, shrewd: 0.6, suspicious: 0.8 };
+const PERS_JURY = { trusting: 0.06, shrewd: -0.10, suspicious: -0.04 };
+
+const Q_DIRECT = [
+  'Is there any news likely to move the price of leaf, sir?',
+  'Before we shake on it: have you heard anything that would change what this tobacco is worth?',
+  'Tell me plainly. Is there news that would raise or lower the price today?'
+];
+const Q_AMBIG = [
+  'How does the market feel to you this morning?',
+  'Quiet day on the levee, is it?',
+  'Anything stirring, or the usual?'
+];
+const Q_DEFECT = ['Sound leaf, all of it? No damp, no mould?', 'Every cask as good as the sample you showed me?'];
+
+/* What the player says, by conduct. */
+const SAYS = {
+  disclosed: ['"I should tell you what I know. {news} I would rather you chose with that in mind."'],
+  silent:    ['(You say nothing about it and name your terms.)'],
+  declined:  ['"I would rather not say, sir. Do we have a bargain?"'],
+  evasive:   ['"The market is what it is. Nothing that need trouble a careful man."', '"I would not wait for miracles. Prices drift."'],
+  lie:       ['"No news at all. Quiet as a Sunday."', '"Nothing. I would tell you if there were."'],
+  plain:     ['(You agree terms.)']
+};
+const SAYS_DEFECT = {
+  disclosed: '"Two casks took water in the hold. The damp is in the leaf. I will take less for them."',
+  silent:    '(You say nothing about the damp and hand over the sample.)',
+  declined:  '"I would rather not discuss the condition. You may inspect what you like."',
+  evasive:   '"It has been kept as well as any in the port."',
+  lie:       '"Sound as a bell. Not a speck of mould."',
+  plain:     '(You agree terms.)'
+};
+/* =========================================================
+   2. GAME STATE AND RULES ENGINE (no DOM access in this section)
+   ========================================================= */
+/* Seeded PRNG (mulberry32). RS is saved with the game so a resumed run continues the same sequence. */
+let RS = 1;
+function R() { RS = RS + 0x6D2B79F5 | 0; let t = Math.imul(RS ^ RS >>> 15, 1 | RS); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+const rnd = (a, b) => a + R() * (b - a);
+const ri = (a, b) => Math.floor(rnd(a, b + 1));
+const pick = a => a[Math.floor(R() * a.length)];
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const r2 = x => Math.round(x * 100) / 100;
+const dayOf = r => Math.min(2, Math.floor(r / 4));
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const usd = n => (n < 0 ? '-$' : '$') + Math.abs(Math.round(n)).toLocaleString('en-US');
+const usd2 = n => '$' + n.toFixed(2);
+
+/* Price model. Public price = base x product of (1 + effect) for every event that is public by round r, x a small noise walk.
+   Informed price also counts events that have reached the player privately but are not yet public. */
+function publicMult(g, r) { let m = 1; for (const e of g.events) if (e.publicAt <= r) m *= 1 + e.pct; return m; }
+function informedMult(g, r) { let m = 1; for (const e of g.events) if (e.publicAt <= r || (e.privateFrom !== null && e.privateFrom <= r)) m *= 1 + e.pct; return m; }
+function privateEvents(g, r) { return g.events.filter(e => e.privateFrom !== null && e.privateFrom <= r && e.publicAt > r); }
+function pendingPublic(g, r) { return g.events.some(e => e.publicAt > r && e.privateFrom !== null); }
+
+function newGame(diff, seed, mode) {
+  seed = (seed >>> 0) || ((Math.random() * 4294967296) >>> 0); RS = seed;
+  const g = {
+    v: 1, seed, mode: mode || 'free', wary: 0, lucky: 0, diff, r: 0, cash: START_CASH, inv: START_INV, rep: 60, risk: 0, events: [], noise: [], price: [], informed: [],
+    deals: [], enc: null, phase: 'market', history: [], docket: [], dayNotes: [],
+    won: 0, lost: 0, counts: { plain: 0, disclosed: 0, silent: 0, declined: 0, evasive: 0, lie: 0 },
+    passed: 0, adviceUsed: 0, foregone: 0, insolvent: false, startNW: 0
+  };
+  const ps = ri(0, 3);
+  g.events.push({ ...PEACE, pct: r2(0.30 + R() * 0.20), privateFrom: ps, publicAt: clamp(ps + ri(2, 4), 3, 10) });
+  for (const e of shuffle(EVENT_POOL).slice(0, 3)) {
+    const hasPriv = R() < 0.6, s = ri(0, 8);
+    g.events.push({ ...e, kind: 'event', privateFrom: hasPriv ? s : null, publicAt: hasPriv ? clamp(s + ri(1, 3), 1, 11) : ri(1, 10) });
+  }
+  for (const e of shuffle(RUMORS).slice(0, 2)) g.events.push({ ...e, kind: 'rumor', privateFrom: null, publicAt: ri(1, 9) });
+  let n = 0;
+  for (let i = 0; i <= TOTAL_ROUNDS; i++) { n = clamp(n + rnd(-0.02, 0.02), -0.04, 0.04); g.noise.push(n); }
+  for (let r = 0; r <= TOTAL_ROUNDS; r++) {
+    g.price.push(r2(BASE_PRICE * publicMult(g, r) * (1 + g.noise[r])));
+    g.informed.push(r2(BASE_PRICE * informedMult(g, r) * (1 + g.noise[r])));
+  }
+  g.startNW = START_CASH + START_INV * g.price[0];
+  g.enc = makeEncounter(g);
+  return g;
+}
+
+/* Build the person waiting at the counter this round. */
+function makeEncounter(g) {
+  const r = g.r, d = DIFF[g.diff], npc = pick(NPCS);
+  const pub = g.price[r], net = g.informed[r] / pub - 1, hasInfo = Math.abs(net) >= 0.04;
+  const witness = R() < 0.3;
+  if (R() < d.defect && g.inv >= 2) {
+    const price = r2(pub * (1 + rnd(-0.02, 0.03))), max = Math.min(g.inv, ri(2, 6));
+    const asked = R() < 0.7;
+    return { npcId: npc.id, kind: 'defect', role: 'buy', price, max, qty: Math.min(2, max), hasInfo: false, adv: false, net: 0, asked, ambiguous: false, witness,
+      qText: asked ? pick(Q_DEFECT) : null, line: 'I would like {qty} of your casks, at $%P each, if the leaf is sound.'.replace('{qty}', 'a few').replace('%P', price.toFixed(2)) };
+  }
+  let role;
+  if (hasInfo) role = net > 0 ? (R() < 0.75 ? 'sell' : 'buy') : (R() < 0.75 ? 'buy' : 'sell');
+  else role = pick(['sell', 'buy']);
+  let price = r2(pub * (role === 'sell' ? 1 + rnd(-0.02, 0.03) : 1 + rnd(-0.03, 0.02)));
+  let max = role === 'sell' ? Math.min(ri(3, 10), Math.floor(g.cash / price)) : Math.min(ri(3, 10), g.inv);
+  if (max < 1) { role = role === 'sell' ? 'buy' : 'sell'; max = role === 'sell' ? Math.min(ri(3, 10), Math.floor(g.cash / price)) : Math.min(ri(3, 10), g.inv); }
+  if (max < 1) return { npcId: npc.id, kind: 'idle', role, price, max: 0, qty: 0, hasInfo, adv: false, net, asked: false, ambiguous: false, witness: false, qText: null, line: '' };
+  const adv = hasInfo && ((role === 'sell' && net > 0) || (role === 'buy' && net < 0));
+  const asked = R() < Math.min(0.95, d.ask * PERS_ASK[npc.pers] + 0.08 * (g.wary || 0));
+  const ambiguous = asked && R() < d.ambiguous;
+  const qty = Math.min(max, 5);
+  return { npcId: npc.id, kind: 'market', role, price, max, qty, hasInfo, adv, net, asked, ambiguous, witness,
+    qText: asked ? pick(ambiguous ? Q_AMBIG : Q_DIRECT) : null,
+    line: npc.lines[role].replace('{qty}', max).replace('%P', price.toFixed(2)) };
+}
+
+/* Player acts. choice: disclose | silent | evasive | lie | pass. Returns a result object for the UI. */
+function respond(g, choice, qty) {
+  const e = g.enc, npc = NPCBY[e.npcId], defect = e.kind === 'defect';
+  if (choice === 'pass' || e.kind === 'idle') { g.passed++; return { pass: true, e }; }
+  const stakes = defect || e.adv;
+  let conduct = !stakes ? 'plain' : choice === 'disclose' ? 'disclosed' : choice === 'silent' ? (e.asked ? 'declined' : 'silent') : choice;
+  qty = clamp(Math.floor(qty) || 1, 1, e.max);
+  let price = e.price, foregone = 0;
+  if (conduct === 'disclosed') {
+    if (defect) price = r2(e.price * 0.70);
+    else {
+      price = r2(g.informed[g.r]);
+      foregone = Math.max(0, (e.role === 'sell' ? price - e.price : e.price - price)) * qty;
+    }
+    if (e.role === 'sell') qty = Math.min(qty, Math.floor(g.cash / price));
+    if (qty < 1) { g.counts.disclosed++; g.rep = clamp(g.rep + 4, 0, 100); return { pass: false, failed: true, conduct, e, npc, price }; }
+  }
+  const total = r2(qty * price);
+  if (e.role === 'sell') { g.cash = r2(g.cash - total); g.inv += qty; } else { g.cash = r2(g.cash + total); g.inv -= qty; }
+  const deal = { id: g.deals.length, round: g.r, day: dayOf(g.r), npcId: e.npcId, role: e.role, qty, price, conduct, defect, adv: e.adv,
+    asked: e.asked, ambiguous: e.ambiguous, witness: e.witness, resolved: conduct === 'disclosed' || conduct === 'plain' || (!defect && !e.adv),
+    said: defect ? SAYS_DEFECT[conduct] : pick(SAYS[conduct]).replace('{news}', newsLine(g)), foregone };
+  g.deals.push(deal);
+  g.counts[conduct]++;
+  /* Word of mouth: lies and evasions make later dealers warier; honest dealing wins a little trust back. */
+  if (conduct === 'lie' || conduct === 'evasive') g.wary = (g.wary || 0) + 1; else if (conduct === 'disclosed' && g.wary) g.wary--;
+  g.foregone += foregone;
+  g.risk = clamp(g.risk + (defect ? DEFECT_RISK[conduct] : CONDUCT[conduct].risk), 0, 100);
+  if (conduct === 'disclosed' && stakes) g.rep = clamp(g.rep + 4, 0, 100);
+  const edge = e.adv && !defect ? qty * Math.abs(g.informed[g.r] - price) : 0;
+  g.history.push({ round: g.r, npcId: e.npcId, role: e.role, qty, price, conduct, defect, adv: e.adv, asked: e.asked });
+  settle(g);
+  return { pass: false, deal, conduct, e, npc, edge, foregone, total };
+}
+
+function newsLine(g) {
+  const p = privateEvents(g, g.r)[0];
+  return p ? p.priv.replace(/\.$/, '.') : 'Word has reached me that bears on the price.';
+}
+
+/* Keep the books sane: no negative cash. */
+function settle(g) {
+  if (g.cash < 0) {
+    const pr = g.price[Math.min(g.r, TOTAL_ROUNDS)];
+    while (g.cash < 0 && g.inv > 0) { g.inv--; g.cash += pr * 0.9; }
+    if (g.cash < 0) { g.cash = 0; g.rep = clamp(g.rep - 10, 0, 100); g.insolvent = true; }
+  }
+  g.cash = r2(g.cash); g.rep = clamp(g.rep, 0, 100);
+}
+
+/* Move to the next slot. Returns 'market', 'dayend' or 'end'. */
+function advance(g) {
+  g.r++;
+  if (g.r >= TOTAL_ROUNDS) { g.phase = 'end'; return 'end'; }
+  if (g.r % 4 === 0) { g.phase = 'dayend'; return 'dayend'; }
+  g.enc = makeEncounter(g); g.phase = 'market'; return 'market';
+}
+function startNextDay(g) { g.enc = makeEncounter(g); g.phase = 'market'; g.dayNotes = []; }
+
+/* Chance a jury finds imposition. Silence on market news that nobody asked about is always protected. */
+function lossProb(g, d) {
+  if (!d.defect && d.conduct === 'silent') return 0;
+  if (d.conduct === 'disclosed' || d.conduct === 'plain') return 0;
+  let base;
+  if (d.defect) base = DEFECT_BASE[d.conduct];
+  else {
+    base = CONDUCT[d.conduct].base;
+    if (d.ambiguous) base *= d.conduct === 'declined' ? 0.35 : 0.95;
+  }
+  const p = base + PERS_JURY[NPCBY[d.npcId].pers] + (d.witness ? 0.10 : 0) + Math.min(0.25, g.risk / 400);
+  return clamp(p, 0.02, 0.97);
+}
+function sueProb(g, d) {
+  let p = PERS_SUE[NPCBY[d.npcId].pers] * DIFF[g.diff].suitMult;
+  if (d.conduct === 'lie' || d.conduct === 'evasive') p += 0.15;
+  if (d.conduct === 'silent' && !d.defect) p *= 0.6;
+  return clamp(p, 0.05, 0.95);
+}
+
+/* End-of-day reckoning. Finds deals where the other side now knows it lost out, then decides who sues. */
+function courtDocket(g, final) {
+  const cases = [], notes = [], now = Math.min(g.r, TOTAL_ROUNDS), pnow = g.price[now];
+  for (const d of g.deals) {
+    if (d.resolved) continue;
+    let harm = 0;
+    if (d.defect) {
+      if (!(final || R() < 0.75)) continue;
+      harm = d.qty * d.price * 0.30;
+    } else {
+      const frac = d.role === 'sell' ? (pnow - d.price) / d.price : (d.price - pnow) / d.price;
+      if (frac > 0.08) harm = frac * d.price * d.qty;
+      else if (!final && pendingPublic(g, now)) continue;
+      else { d.resolved = true; continue; }
+    }
+    d.resolved = true; d.harm = r2(harm);
+    const npc = NPCBY[d.npcId];
+    if (R() < sueProb(g, d)) cases.push({ dealId: d.id });
+    else {
+      const loss = { silent: 2, declined: 3, evasive: 8, lie: 10 }[d.conduct] || 0;
+      g.rep = clamp(g.rep - loss, 0, 100);
+      notes.push(d.defect
+        ? npc.name + ' found the fault in the leaf but let it go. Word got round all the same (reputation -' + loss + ').'
+        : npc.name + ' saw the market move after your deal and chose not to sue (reputation -' + loss + ').');
+    }
+  }
+  g.docket = cases; g.dayNotes = notes;
+  return cases;
+}
+
+/* Decide one case. */
+function decideCase(g, dealId) {
+  const d = g.deals[dealId], p = lossProb(g, d), lost = R() < p;
+  let pay = 0, fees;
+  if (lost) {
+    pay = r2(d.harm + 0.10 * d.qty * d.price); fees = 300;
+    g.cash = r2(g.cash - pay - fees); g.rep = clamp(g.rep - 15, 0, 100); g.lost++;
+  } else {
+    fees = 60; g.cash = r2(g.cash - fees); g.won++;
+    if (d.conduct === 'silent' && !d.defect) g.rep = clamp(g.rep + 2, 0, 100);
+  }
+  settle(g);
+  d.verdict = lost ? 'lost' : 'won';
+  return { lost, p, pay, fees, d };
+}
+
+/* Final tally. */
+function finalReport(g) {
+  const pr = g.price[TOTAL_ROUNDS], nw = r2(g.cash + g.inv * pr), profit = r2(nw - g.startNW);
+  const lies = g.counts.lie, ev = g.counts.evasive;
+  const score = Math.max(0, Math.round(profit / 8 + g.rep * 18 + (100 - g.risk) * 12 - g.lost * 400 - lies * 50 - ev * 25));
+  let rank;
+  if (profit > 0 && lies === 0 && ev === 0 && g.lost === 0) rank = 'Laidlaw would approve';
+  else if (profit > 0) rank = 'Profitable, and exposed';
+  else if (lies === 0 && ev === 0) rank = 'Scrupulous, and out of pocket';
+  else rank = 'Ruined at the bar';
+  return { nw, profit, score, rank, pr };
+}
+
+/* Counsel's advice for the current counter. */
+function adviceText(g) {
+  const e = g.enc;
+  if (e.kind === 'idle') return 'You have no cash to buy and no stock to sell. Let the hour pass.';
+  if (e.kind === 'defect') return 'Different ground. Laidlaw protects silence about market news from outside. A fault in the goods is a fact about the thing itself, where the law often expects more. Never tell him the leaf is sound when you know it is not.';
+  if (!e.adv) return e.hasInfo
+    ? 'You know something, but it works against you in this deal, so silence gives you no edge. Consider passing, or trading only if the price still suits you.'
+    : 'You hold no private news that matters here. Trade if the price suits you. There is nothing to disclose or hide.';
+  if (e.asked) return e.ambiguous
+    ? 'This is idle talk, not the pointed question Girault put to Organ. Declining it costs little. A false reply would still be a misstatement.'
+    : 'You are asked outright, as Organ was. You may decline, and the Court said you need not volunteer outside news, but the jury may weigh what you do say. Whatever you say must not tend to mislead.';
+  return 'Nobody has asked. Silence about outside news is protected. A false reassurance is not. Staying quiet may still cost you goodwill.';
+}
+
+/* Case Note shown after each decision. Uses [[term]] for glossary terms. */
+function caseNote(g, res) {
+  const e = res.e, c = res.conduct, cite = 'Laidlaw v. Organ, 15 U.S. (2 Wheat.) 178 (1817)';
+  if (res.pass) return { title: 'You let it pass', body: 'No deal, no statement, no exposure. Declining to trade is always safe. The Laidlaw question only arises when you trade while knowing something the other side does not.', cite };
+  if (res.failed) return { title: 'No deal at the fair price', body: 'Once you told ' + res.npc.name + ' the news, the fair price was more than you could pay. Honesty cost you the trade, and the law did not require it of you.', cite };
+  const edge = res.edge ? ' Your expected edge on this deal: about ' + usd(res.edge) + ' at today\'s informed value.' : '';
+  let title, body;
+  if (e.kind === 'defect') {
+    if (c === 'disclosed') { title = 'Fault disclosed'; body = 'You named the damp and took less. Nothing is hidden, so nothing can be said to impose on the buyer. Laidlaw concerned news about the market. Faults in the goods themselves stand on different ground, where many legal systems expect more of a seller.'; }
+    else if (c === 'silent' || c === 'declined') { title = 'Beyond the Laidlaw rule'; body = 'Laidlaw covered [[extrinsic information]] such as peace or prices. A hidden fault in the goods is a fact about the thing sold. Many jurisdictions treat knowing concealment of a [[latent defect]] as actionable, and rules differ for goods, land and consumers. Do not assume silence is safe here.'; }
+    else { title = 'A false statement about the goods'; body = 'Telling a buyer the leaf is sound when you know it is not is misrepresentation under any system. The Court in Laidlaw drew the line at saying or doing something tending to impose on the other party, and this crosses it.'; }
+  } else if (c === 'plain') {
+    title = 'Nothing at stake';
+    body = e.hasInfo ? 'You know something, but it works against you in this trade, so silence gives you no edge and the other side loses nothing from it.' : 'You held no private news that mattered, so there was nothing to disclose or hide. The Laidlaw question only arises when one side knows something that moves the price and the other does not.';
+  } else if (c === 'disclosed') {
+    title = 'You told them';
+    body = 'Under Laidlaw a [[vendee]] is not bound to share outside news that only he holds. You shared it anyway. That cost you about ' + usd(res.foregone) + ' of advantage the law allowed you to keep, and it won goodwill (reputation +4). The rule permits silence. It does not demand it.';
+  } else if (c === 'silent') {
+    title = 'Silence is protected';
+    body = 'The Court held that a buyer need not communicate [[extrinsic information]] that only he knows and that may affect price. Nobody asked and you said nothing untrue, so a [[directed verdict]] for you would be right if anyone sued. Expect a reputation for sharp dealing. Legal and liked are different things.' + edge;
+  } else if (c === 'declined') {
+    title = 'Close to the line';
+    body = e.ambiguous
+      ? 'Vague chat is not the pointed question Girault put to Organ, so declining it carries little risk. A false reply to it would still be a misstatement.'
+      : 'In the case, Girault asked whether there was news that would raise the price. The Court still held the buyer was not bound to tell, but it sent the question of [[imposition]] to the jury. A plain refusal is far safer than a misleading answer, though a jury may weigh it.';
+    body += edge;
+  } else if (c === 'evasive') {
+    title = 'Tending to impose';
+    body = 'Marshall wrote that "each party must take care not to say or do anything tending to impose upon the other." A remark meant to leave a false impression can be [[imposition]] even if it is not a flat lie. This one would go to a jury, and juries dislike it.' + edge;
+  } else {
+    title = 'Outside the rule';
+    body = 'Laidlaw protects silence about outside news. It does not protect a false statement. This is misrepresentation: a court can undo the deal and award damages, and you will not be believed next time.' + edge;
+  }
+  return { title, body, cite };
+}
+/* =========================================================
+   3. UI: helpers, dialogs, title screen, reference dialogs
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const screen = $('#screen'), veil = $('#veil'), tip = $('#tip');
+let G = null;
+const S = { diff: 'trader', tut: 0, tutPick: null, quizPick: null, qty: 1, qRound: -1, adviceOpen: false, sound: false, nx: 'dayend', lastFocus: null, closable: true };
+const SAVE = 'nom1815.v1';
+
+function save() { try { G.rs = RS; localStorage.setItem(SAVE, JSON.stringify(G)); } catch (e) { /* storage may be blocked */ } }
+function load() {
+  try {
+    const s = localStorage.getItem(SAVE); if (!s) return null;
+    const g = JSON.parse(s);
+    if (!g || g.v !== 1) return null;
+    if (g.phase === 'end' && !(g.docket && g.docket.length)) return null;
+    return g;
+  } catch (e) { return null; }
+}
+function clearSave() { try { localStorage.removeItem(SAVE); } catch (e) { /* ignore */ } }
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/* Turns [[term]] into a tappable glossary button. */
+const rich = s => esc(s).replace(/\[\[([^\]]+)\]\]/g, (m, t) => GLOSSARY[t.toLowerCase()] ? '<button type="button" class="term" data-term="' + t.toLowerCase() + '">' + t + '</button>' : t);
+const slotLabel = r => DAYS[dayOf(r)].name.slice(0, 3) + ' ' + SLOTS[r % 4].toLowerCase();
+
+/* Sound (off by default, starts only after a click) */
+let ac = null;
+function beep(freqs, dur) {
+  if (!S.sound) return; dur = dur || 0.1;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ac.currentTime;
+    freqs.forEach((f, i) => {
+      const o = ac.createOscillator(), gn = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      gn.gain.setValueAtTime(0.0001, t + i * dur);
+      gn.gain.exponentialRampToValueAtTime(0.06, t + i * dur + 0.015);
+      gn.gain.exponentialRampToValueAtTime(0.0001, t + i * dur + dur);
+      o.connect(gn); gn.connect(ac.destination); o.start(t + i * dur); o.stop(t + i * dur + dur + 0.03);
+    });
+  } catch (e) { /* audio unavailable */ }
+}
+
+/* Glossary tooltip */
+function showTip(el) {
+  const t = GLOSSARY[el.dataset.term]; if (!t) return;
+  tip.textContent = t; tip.hidden = false;
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = clamp(r.left, 8, Math.max(8, innerWidth - w - 8)) + 'px';
+  tip.style.top = (r.bottom + 6 + h > innerHeight - 8 ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
+}
+const hideTip = () => { tip.hidden = true; };
+document.addEventListener('mouseover', e => { const t = e.target.closest && e.target.closest('.term'); if (t) showTip(t); });
+document.addEventListener('mouseout', e => { if (e.target.closest && e.target.closest('.term')) hideTip(); });
+document.addEventListener('focusin', e => { if (e.target.classList && e.target.classList.contains('term')) showTip(e.target); else hideTip(); });
+
+/* Dialogs */
+function openDlg(html, closable) {
+  S.closable = closable !== false;
+  if (veil.hidden) S.lastFocus = document.activeElement;
+  veil.innerHTML = '<div class="dlg" role="dialog" aria-modal="true" tabindex="-1">' + html + '</div>';
+  veil.hidden = false;
+  const d = veil.firstChild, f = d.querySelector('[data-focus]') || d.querySelector('button.btn') || d;
+  f.focus(); d.scrollTop = 0;
+}
+function closeDlg() {
+  veil.hidden = true; veil.innerHTML = ''; hideTip();
+  if (S.lastFocus && S.lastFocus.focus && document.contains(S.lastFocus)) { try { S.lastFocus.focus(); } catch (e) { /* ignore */ } }
+}
+veil.addEventListener('mousedown', e => { if (e.target === veil && S.closable) closeDlg(); });
+
+/* ---------- Title screen ---------- */
+function showTitle() {
+  G = null; S.tut = 0; S.tutPick = null; S.quizPick = null;
+  $('#sub').textContent = 'Price Current and Intelligence · A game on Laidlaw v. Organ';
+  const saved = load();
+  screen.innerHTML =
+    '<section class="hero"><div>' +
+    '<h2>You hold a secret. The man at your counter does not.</h2>' +
+    '<p class="intro">New Orleans, February 1815. In <i>Laidlaw v. Organ</i>, a buyer who knew a treaty of peace had been signed bought 111 hogsheads of tobacco from sellers who had not yet heard. The Supreme Court held that a buyer need not tell the seller what only he knows about the market, but that each side must take care not to say or do anything tending to impose upon the other. Trade through three days of the market and find out where silence ends and misrepresentation begins.</p>' +
+    '<div class="label">Choose your difficulty</div>' +
+    '<div class="diffs" role="radiogroup" aria-label="Difficulty">' +
+    Object.keys(DIFF).map(k => '<button type="button" role="radio" class="diff" data-act="diff" data-v="' + k + '" aria-checked="' + (S.diff === k) + '"><b>' + DIFF[k].label + '</b><br><span class="muted">' + esc(DIFF[k].blurb) + '</span></button>').join('') +
+    '</div><div class="row">' +
+    '<button class="btn primary" data-act="tutorial">Start with the tutorial</button>' +
+    '<button class="btn" data-act="begin">Skip to the market</button>' +
+    (saved ? '<button class="btn ghost" data-act="resume">Continue saved game</button>' : '') +
+    '<button class="btn ghost" data-act="howto">How to play</button></div>' +
+    '<div class="row" style="margin-top:10px"><button class="btn" data-act="daily">Daily challenge</button><input id="seedIn" placeholder="Class code" aria-label="Class code" size="9"><button class="btn" data-act="seedplay">Play code</button><button class="btn ghost" data-act="mkcode">New class code</button><button class="btn ghost" data-act="classcmp">Class comparison</button></div>' +
+    '</div><aside class="handbill"><h3>The Case in Brief</h3><ul>' +
+    '<li>On 19 February 1815, Hector Organ bought 111 [[hogshead]]s of tobacco from Peter Laidlaw &amp; Co., a firm of [[commission merchant]]s.</li>' +
+    '<li>Organ had been told the treaty of peace was signed. The record says the seller\'s man had not yet heard, and that prices rose 30 to 50 percent.</li>' +
+    '<li>Girault, for the sellers, asked whether there was any news likely to raise the price.</li>' +
+    '<li>The trial judge told the jury to find for Organ. The Supreme Court reversed. Whether anything tended to impose on the seller was for the jury.</li>' +
+    '</ul></aside></section>';
+  screen.querySelectorAll('.handbill li').forEach(li => { li.innerHTML = rich(li.textContent.replace(/&amp;/g, '&')); });
+}
+
+/* ---------- Reference dialogs ---------- */
+function showHowTo() {
+  openDlg('<h2>How to play</h2>' +
+    '<p>You trade tobacco for three days, four hours at a time, twelve rounds in all. Each round someone comes to your counter to buy or sell.</p>' +
+    '<h3>What you know</h3><p>Sometimes news reaches you before it reaches the market. Your ledger shows it in red. The price chart shows the public price, and a dashed line shows what you think the price will become.</p>' +
+    '<h3>What you can say</h3><p>When you hold an edge, you can <b>disclose</b>, <b>stay silent or decline to answer</b>, <b>answer evasively</b>, or <b>lie</b>. Each carries a different <b>imposition risk</b>.</p>' +
+    '<h3>Courts</h3><p>If the market moves against someone you traded with, they may sue at the end of the day. A jury decides whether you imposed on them. Silence about outside market news is protected. Misleading statements are not.</p>' +
+    '<h3>Score</h3><p>Profit counts, but so do reputation, legal exposure and lost cases. The best result is a profit made without lying.</p>' +
+    '<h3>Keys</h3><p class="mono" style="font-size:.9rem">1 to 4 choose an answer · P pass · + and - change quantity</p>' +
+    '<div class="foot"><button class="btn primary" data-act="close" data-focus>Close</button></div>');
+}
+
+function showThenNow() {
+  const item = (h, t) => '<div class="opt"><b>' + h + '</b><br>' + rich(t) + '</div>';
+  openDlg('<h2>Then and now</h2>' +
+    '<p>Laidlaw is a starting point. Modern law has built exceptions around it. These are general points for study and not legal advice. Check current sources for any real matter.</p>' +
+    item('Relationships of trust', 'A [[fiduciary]], such as an agent, trustee or partner, must disclose what bears on the relationship. Laidlaw concerns strangers dealing at arm\'s length. See Restatement (Second) of Contracts §161(d).') +
+    item('Half-truths and earlier statements', 'Silence becomes misleading when it is needed to stop an earlier statement from being false or misleading. A true but partial answer can still be [[imposition]]. See §161(a).') +
+    item('Active concealment', 'Hiding the truth by acts, such as painting over rot, is treated like a false statement. This matches the Court\'s own warning against doing anything tending to impose.') +
+    item('Basic assumptions and good faith', '§161(b) treats nondisclosure as an assertion where disclosure would correct the other side\'s mistake about a basic assumption of the contract and silence would fall short of fair dealing. Information about market value of the Laidlaw kind is usually treated differently from facts about the thing itself, though courts differ.') +
+    item('Faults in goods or property', 'Known [[latent defect]]s, especially in homes and consumer goods, often must be disclosed under statutes or case law. Rules vary widely by place.') +
+    item('Statutes', 'Securities law restricts trading on material non-public information. Examples are US Rule 10b-5 and the SEBI (Prohibition of Insider Trading) Regulations, 2015 in India. Insurance contracts call for utmost good faith, and consumer and lending laws add disclosure duties.') +
+    item('Comparative note: Indian Contract Act, 1872', 'Section 17 treats active concealment by a person with knowledge as fraud. Its Explanation says mere silence about facts likely to affect another\'s willingness to contract is not fraud, unless there is a duty to speak or the silence is itself equivalent to speech. An illustration to the section involves two traders where one holds private price information and need not share it, which is close to Laidlaw. Read the current text of the section and its illustrations.') +
+    '<div class="foot"><button class="btn primary" data-act="close" data-focus>Close</button></div>');
+}
+/* =========================================================
+   4. UI: tutorial (the Organ and Girault scene from the reported case)
+   ========================================================= */
+const TUT_CHOICES = [
+  { id: 'disclose', k: 1, tag: 'safe', head: 'Tell him about the peace', sub: 'You give up your advantage and pay the price the news deserves.',
+    res: 'You would have been honest, and the Court says you were not required to be. A buyer need not communicate outside news that only he knows. Honesty here is generous, not mandatory.' },
+  { id: 'silent', k: 2, tag: 'low', head: 'Say nothing, or decline to answer', sub: 'You keep the news to yourself and settle the bargain.',
+    res: 'This is the nearest to the record. The Court held a buyer is not bound to communicate this kind of news. A direct question still invites a closer look, which is why the jury had work to do.' },
+  { id: 'evasive', k: 3, tag: 'high', head: 'Answer vaguely so he stops asking', sub: 'You say something true-sounding that points him away from the news.',
+    res: 'Risky. The Court warned that each party must take care not to say or do anything tending to impose upon the other. A remark built to leave a false impression can count, even without a flat lie.' },
+  { id: 'lie', k: 4, tag: 'vhigh', head: 'Tell him there is no news', sub: 'A plain false statement.',
+    res: 'Outside the rule. Silence about outside news is protected. A false statement is misrepresentation, and a court can undo the deal.' }
+];
+
+function renderTutorial() {
+  const t = S.tut;
+  $('#sub').textContent = 'Tutorial · Sunday, 19 February 1815 · soon after sunrise';
+  let h = '<section style="padding-block:24px;max-width:780px">';
+  if (t === 0) {
+    const pick = S.tutPick ? TUT_CHOICES.find(c => c.id === S.tutPick) : null;
+    h += '<div class="label">Step 1 of 3 · From the reported case</div><h2 style="margin:6px 0 12px;font-size:2rem">You are Hector Organ</h2>' +
+      '<p>' + rich('A messenger from the British fleet has brought word that a treaty of peace was signed at Ghent. The news is spreading through the city. Francis Girault of Peter Laidlaw & Co., a firm of [[commission merchant]]s, has not heard it. You have. Soon after sunrise you call on Girault, and you bargain over 111 [[hogshead]]s of tobacco.') + '</p>' +
+      '<p>' + rich('Peace will lift the price. The record puts the rise at 30 to 50 percent. Girault looks up and asks whether there is any news likely to raise the price of the article he is about to sell.') + '</p>' +
+      '<div class="ask" style="margin-top:16px">What do you say?</div><div class="choices">' +
+      TUT_CHOICES.map(c => '<button class="choice" data-act="tutpick" data-v="' + c.id + '"' + (pick ? ' disabled style="opacity:' + (pick.id === c.id ? 1 : 0.5) + '"' : '') + '><span class="k">' + c.k + '</span><span><b>' + esc(c.head) + '</b><small>' + esc(c.sub) + '</small></span><span class="tag ' + c.tag + '">' + TAGTXT[c.tag] + '</span></button>').join('') + '</div>';
+    if (pick) {
+      h += '<div class="panel" style="margin-top:16px"><h3>Your answer</h3><p>' + rich(pick.res) + '</p>' +
+        '<h3>What the record shows</h3><p>' + rich('The record does not report what Organ answered. It says only that there was no evidence he asserted or suggested anything meant to make Girault believe the news did not exist. Girault raised no objection to the sale the next day.') + '</p>' +
+        '<button class="btn primary" data-act="tutnext" data-focus>Continue</button></div>';
+    }
+  } else if (t === 1) {
+    const opts = [
+      { id: 'a', txt: 'No. Silence ended the matter, so the judge was right to take the case from the jury.', fb: 'Not quite. Silence is not a breach by itself, but the Court held the jury should still decide whether anything tended to impose on Girault.' },
+      { id: 'b', txt: 'Yes. Organ was not bound to tell, but whether he imposed on the seller was a question for the jury.', fb: 'Correct. The Court held that Organ was not bound to communicate the news, and that the question whether any imposition was practised ought to have been submitted to the jury. The [[directed verdict]] was erroneous and the case was sent back for a new trial ([[venire de novo]]).', right: true },
+      { id: 'c', txt: 'Yes. Organ had a duty to disclose the treaty, so the jury should have been told to find for the sellers.', fb: 'No. The Court held he was not bound to communicate it. The error was in removing the imposition question from the jury.' }
+    ];
+    const q = S.quizPick;
+    h += '<div class="label">Step 2 of 3 · What happened next</div><h2 style="margin:6px 0 12px;font-size:2rem">The trial and the appeal</h2>' +
+      '<p>' + rich('The sellers refused to deliver the tobacco and Organ sued. The trial judge told the jury to find for Organ, and it did. Laidlaw & Co. took the case to the Supreme Court by [[writ of error]].') + '</p>' +
+      '<div class="ask" style="margin-top:16px">Did the trial judge make a mistake?</div>' +
+      opts.map(o => '<button class="choice opt' + (q ? (o.right ? ' right' : (q === o.id ? ' wrong' : '')) : '') + '" style="width:100%;display:block" data-act="quiz" data-v="' + o.id + '"' + (q ? ' disabled' : '') + '>' + esc(o.txt) + '</button>').join('');
+    if (q) h += '<div class="panel" style="margin-top:12px"><p>' + rich(opts.find(o => o.id === q).fb) + '</p>' +
+      '<p><b>The rule you will play with:</b> silence about outside market news is protected. Saying or doing something that tends to mislead is not.</p>' +
+      '<button class="btn primary" data-act="tutnext" data-focus>Continue</button></div>';
+  } else {
+    h += '<div class="label">Step 3 of 3 · Your turn</div><h2 style="margin:6px 0 12px;font-size:2rem">Now you are the trader</h2>' +
+      '<p>Three days, twelve rounds. News will reach you before the market and people will come to your counter. Decide what to say, and see who sues and who walks away. The people you meet are fictional. Only the Organ scene above comes from the case.</p>' +
+      '<p class="muted">Difficulty: <b>' + DIFF[S.diff].label + '</b></p>' +
+      '<div class="row"><button class="btn primary" data-act="begin" data-focus>Open for business</button><button class="btn ghost" data-act="title">Back to title</button></div>';
+  }
+  screen.innerHTML = h + '</section>';
+  const f = screen.querySelector('[data-focus]'); if (f) f.focus();
+}
+/* =========================================================
+   5. UI: the market screen
+   ========================================================= */
+function meterHTML(label, val, cls, extra) {
+  return '<div class="stat"><div class="label">' + label + '</div><div class="v">' + val + '<span class="muted" style="font-size:.8rem">/100</span></div>' +
+    '<div class="meter ' + cls + '" role="progressbar" aria-label="' + label + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + val + '"><i style="width:' + val + '%"></i></div>' + (extra || '') + '</div>';
+}
+
+function booksPanel(g) {
+  const nw = g.cash + g.inv * g.price[g.r], rc = g.risk >= 60 ? 'risk high' : g.risk >= 30 ? 'risk mid' : 'risk';
+  return '<div class="panel"><div class="stats">' +
+    '<div class="stat"><div class="label">Cash</div><div class="v">' + usd(g.cash) + '</div></div>' +
+    '<div class="stat"><div class="label">Hogsheads in store</div><div class="v">' + g.inv + '</div></div>' +
+    meterHTML('Reputation', g.rep, '') +
+    meterHTML('Imposition risk', g.risk, rc) +
+    '</div><div class="muted" style="margin-top:12px;font-size:.95rem">Net worth <span class="num">' + usd(nw) + '</span>, from <span class="num">' + usd(g.startNW) + '</span> at the start. Cases won ' + g.won + ', lost ' + g.lost + '.</div></div>';
+}
+
+function chartSVG(g) {
+  const W = 640, H = 230, L = 46, R = 16, T = 14, B = 34, y0 = 40, y1 = 150, last = TOTAL_ROUNDS - 1;
+  const x = i => L + (W - L - R) * i / last, y = v => T + (H - T - B) * (1 - (clamp(v, y0, y1) - y0) / (y1 - y0));
+  let s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Price of tobacco per hogshead, now ' + usd2(g.price[g.r]) + '">';
+  for (let v = 40; v <= 140; v += 20) s += '<line class="grid-l" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text x="' + (L - 7) + '" y="' + (y(v) + 4) + '" text-anchor="end">$' + v + '</text>';
+  DAYS.forEach((d, i) => { s += '<line class="grid-l" x1="' + x(i * 4) + '" x2="' + x(i * 4) + '" y1="' + T + '" y2="' + (H - B) + '"/><text x="' + x(i * 4) + '" y="' + (H - 12) + '">' + d.name.slice(0, 3) + ' ' + d.date.split(' ')[0] + '</text>'; });
+  const n = Math.min(g.r, last), pub = [], inf = [];
+  for (let i = 0; i <= n; i++) { pub.push(x(i) + ',' + y(g.price[i])); inf.push(x(i) + ',' + y(g.informed[i])); }
+  const differs = g.informed.slice(0, n + 1).some((v, i) => Math.abs(v - g.price[i]) > 0.5);
+  if (differs) s += '<polyline class="inf" points="' + inf.join(' ') + '"/><circle class="dot-inf" cx="' + x(n) + '" cy="' + y(g.informed[n]) + '" r="4.5"/>';
+  s += '<polyline class="pub" points="' + pub.join(' ') + '"/><circle class="dot" cx="' + x(n) + '" cy="' + y(g.price[n]) + '" r="4.5"/>';
+  return { svg: s + '</svg>', differs };
+}
+
+function chartPanel(g) {
+  const c = chartSVG(g), now = g.price[g.r], chg = (now / g.price[0] - 1) * 100;
+  return '<div class="panel"><div class="row" style="justify-content:space-between;align-items:baseline"><h2 style="font-size:1.4rem">Price of leaf, per hogshead</h2>' +
+    '<div><span class="big num" style="font-size:2rem">' + usd2(now) + '</span> <span class="muted num">' + (chg >= 0 ? '+' : '') + chg.toFixed(0) + '% since Saturday dawn</span></div></div>' +
+    c.svg + '<div class="legend"><span>Public price</span>' + (c.differs ? '<span class="l2">What you expect it to become</span>' : '') + '</div></div>';
+}
+
+function newsPanel(g) {
+  const items = [];
+  for (const e of g.events) {
+    if (e.publicAt <= g.r) items.push({ t: e.publicAt, pub: true, e });
+    else if (e.privateFrom !== null && e.privateFrom <= g.r) items.push({ t: e.privateFrom, pub: false, e });
+  }
+  items.sort((a, b) => b.t - a.t || (a.pub ? 1 : -1));
+  let h = '<div class="panel"><h2 style="font-size:1.4rem">Dispatches</h2>';
+  if (!items.length) return h + '<p class="muted">A quiet morning on the levee. No news yet.</p></div>';
+  h += '<ul class="news">' + items.slice(0, 8).map(it => {
+    const e = it.e, chip = e.kind === 'key' ? '<span class="chip">from the case</span>' : e.kind === 'rumor' ? '<span class="chip fict">rumour</span>' : '<span class="chip fict">invented</span>';
+    const when = it.pub
+      ? 'Public · ' + slotLabel(e.publicAt) + (e.privateFrom !== null && e.privateFrom < e.publicAt ? ' · you knew from ' + slotLabel(e.privateFrom) : '')
+      : 'Known only to you · since ' + slotLabel(e.privateFrom);
+    return '<li class="' + (it.pub ? '' : 'priv') + (it.t === g.r ? ' fresh' : '') + '"><span class="when">' + when + '</span>' + esc(it.pub ? e.head : e.priv) + ' ' + chip + (!it.pub && e.note ? '<br><span class="muted" style="font-size:.92rem">' + esc(e.note) + '</span>' : '') + '</li>';
+  }).join('') + '</ul></div>';
+  return h;
+}
+
+function choiceDefs(g) {
+  const e = g.enc, defect = e.kind === 'defect';
+  if (!(defect || e.adv)) return [{ c: 'silent', head: 'Trade at this price', sub: 'Nothing here needs disclosing or hiding.', tag: null }];
+  const edge = defect ? Math.round(S.qty * e.price * 0.3) : Math.round(S.qty * Math.abs(g.informed[g.r] - e.price));
+  if (defect) return [
+    { c: 'disclose', head: 'Name the fault and lower the price', sub: 'Take 30% off. Nothing is hidden.', tag: 'safe' },
+    e.asked ? { c: 'silent', head: 'Decline to discuss the leaf', sub: 'Tell him to inspect it himself.', tag: 'high' }
+            : { c: 'silent', head: 'Say nothing about the damp', sub: 'Hand over the sample and name terms.', tag: 'high' },
+    { c: 'evasive', head: e.asked ? 'Say it has been well kept' : 'Praise the shed and the sample', sub: 'True of the shed, and silent on the casks.', tag: 'high' },
+    { c: 'lie', head: e.asked ? 'Swear it is sound' : 'Volunteer that it is sound', sub: 'A plain false statement about the goods.', tag: 'vhigh' }];
+  if (e.asked) return [
+    { c: 'disclose', head: 'Tell him the news', sub: 'Costs you about ' + usd(edge) + ' of advantage.', tag: 'safe' },
+    { c: 'silent', head: 'Decline to answer', sub: 'Say you would rather not say, and trade at his price.', tag: 'low' },
+    { c: 'evasive', head: 'Answer vaguely', sub: 'Say something meant to put him off the scent.', tag: 'high' },
+    { c: 'lie', head: 'Say there is no such news', sub: 'Keeps about ' + usd(edge) + ' if nobody finds out.', tag: 'vhigh' }];
+  return [
+    { c: 'disclose', head: 'Mention the news, then trade fairly', sub: 'Costs you about ' + usd(edge) + ' of advantage.', tag: 'safe' },
+    { c: 'silent', head: 'Say nothing and trade', sub: 'He has not asked. You keep about ' + usd(edge) + '.', tag: 'safe' },
+    { c: 'evasive', head: 'Offer a misleading remark', sub: 'Volunteer something that points him the wrong way.', tag: 'high' },
+    { c: 'lie', head: 'Volunteer a false statement', sub: 'Reassure him that nothing is happening.', tag: 'vhigh' }];
+}
+
+function counterPanel(g) {
+  const e = g.enc, npc = NPCBY[e.npcId], dd = DIFF[g.diff];
+  if (e.kind === 'idle') return '<div class="panel"><h2>A quiet counter</h2><p>No one comes by, and you have neither cash to buy nor stock to sell. Let the hour pass.</p><div class="foot"><button class="btn primary" data-act="idle" data-focus>Continue</button></div></div>';
+  const defect = e.kind === 'defect', stakes = defect || e.adv, price = e.price;
+  let h = '<div class="panel"><div class="mp">' + portrait(npc, defect ? 'neutral' : (e.asked ? 'suspicious' : 'hopeful'), g.r % 4) + '<div style="flex:1"><div class="npc"><h2>' + esc(npc.name) + '</h2><span><span class="chip fict">fictional</span> <span class="chip">' + npc.pers + '</span></span></div>' +
+    '<div class="muted" style="margin:-6px 0 6px">' + esc(npc.title) + '</div></div></div>' + (g.wary ? '<p class="muted"><b>Word on the levee:</b> ' + (g.wary >= 3 ? 'Your name is known, and not kindly.' : 'Some dealers have heard stories about you.') + ' Expect sharper questions.</p>' : '') + '<div class="quote">' + esc(e.line) + '</div>' +
+    '<table class="terms"><tr><th>Offer</th><td>' + (e.role === 'sell' ? 'He sells to you' : 'He buys from you') + '</td></tr>' +
+    '<tr><th>Price per hogshead</th><td class="tick ' + (g.r && g.price[g.r] > g.price[g.r - 1] ? 'up' : 'dn') + '">' + usd2(price) + '</td></tr>' +
+    '<tr><th>Quantity</th><td>' + (e.max > 1 ? '<span class="qty"><button data-act="qty" data-d="-1" aria-label="Fewer hogsheads">-</button><output>' + S.qty + '</output><button data-act="qty" data-d="1" aria-label="More hogsheads">+</button></span> <span class="muted">of ' + e.max + '</span>' : '1') + '</td></tr>' +
+    '<tr><th>Total</th><td>' + usd2(S.qty * price) + '</td></tr></table>';
+  if (defect) h += '<div class="secret"><b>Known only to you.</b> Two casks in this lot took water in the hold. The damp is in the leaf, and a buyer cannot tell without opening them.</div>';
+  else if (e.adv) h += '<div class="secret"><b>Known only to you.</b> ' + esc(privateEvents(g, g.r).map(p => p.priv).join(' ')) + ' Likely value once it is public: <span class="num">' + usd2(g.informed[g.r]) + '</span> a hogshead, against ' + usd2(g.price[g.r]) + ' today.</div>';
+  else if (e.hasInfo) h += '<div class="secret"><b>You know something</b>, but it works against you in this trade, so silence gives you no edge.</div>';
+  h += e.asked ? '<div class="ask">He asks: &ldquo;' + esc(e.qText) + '&rdquo;</div>' : '<p class="muted">He asks you nothing. The next move is yours.</p>';
+  if (dd.advice === 'auto' || S.adviceOpen) h += '<div class="advice"><b>Counsel:</b> ' + rich(adviceText(g)) + '</div>';
+  else {
+    const off = g.cash < dd.adviceCost || g.adviceUsed >= dd.adviceMax;
+    h += '<div class="foot" style="margin:0 0 10px"><button class="btn ghost" data-act="advice"' + (off ? ' disabled' : '') + '>Ask counsel (' + usd(dd.adviceCost) + ')</button>' +
+      (dd.adviceMax < 999 ? '<span class="muted" style="font-size:.9rem">' + Math.max(0, dd.adviceMax - g.adviceUsed) + ' left</span>' : '') + '</div>';
+  }
+  h += '<div class="choices">' + choiceDefs(g).map((c, i) => '<button class="choice" data-act="resp" data-c="' + c.c + '"><span class="k">' + (i + 1) + '</span><span><b>' + esc(c.head) + '</b><small>' + esc(c.sub) + '</small></span>' +
+    (dd.advice === 'auto' && c.tag ? '<span class="tag ' + c.tag + '">' + TAGTXT[c.tag] + '</span>' : '') + '</button>').join('') + '</div>';
+  return h + '<div class="foot"><button class="btn ghost" data-act="resp" data-c="pass"><span class="mono">P</span> Pass, do not trade</button></div></div>';
+}
+
+function renderMarket() {
+  const g = G, r = g.r, fresh = S.qRound !== r;
+  if (fresh) { S.qRound = r; S.qty = g.enc.qty || 1; S.adviceOpen = false; }
+  $('#sub').textContent = DAYS[dayOf(r)].name + ', ' + DAYS[dayOf(r)].date + ' 1815 · ' + SLOTS[r % 4] + ' · Round ' + (r + 1) + ' of ' + TOTAL_ROUNDS;
+  screen.innerHTML = '<div class="grid"><div class="col">' + booksPanel(g) + chartPanel(g) + newsPanel(g) + '</div><div class="col">' + counterPanel(g) + '</div></div>';
+  if (fresh) window.scrollTo(0, 0);
+}
+
+/* The Case Note shown after every decision */
+function showNote(res) {
+  const n = caseNote(G, res);
+  let h = '<div class="label">Case note</div><h2>' + esc(n.title) + '</h2>';
+  if (res.deal) {
+    const d = res.deal;
+    h += '<dl class="rec"><dt>You said</dt><dd><i>' + esc(d.said) + '</i></dd><dt>The deal</dt><dd>' + (d.role === 'sell' ? 'Bought ' : 'Sold ') + d.qty + ' hogshead' + (d.qty > 1 ? 's' : '') + ' at ' + usd2(d.price) + ', ' + usd2(res.total) + ' in all.</dd>' +
+      '<dt>Imposition risk</dt><dd>' + G.risk + ' of 100</dd></dl>';
+  }
+  h += '<p>' + rich(n.body) + '</p><div class="cite">' + esc(n.cite) + '</div><div class="foot"><button class="btn primary" data-act="note-next" data-focus>Continue</button></div>';
+  openDlg(h, false);
+}
+/* =========================================================
+   6. UI: flow, courtroom, day end, debrief, events
+   ========================================================= */
+function proceed() {
+  closeDlg();
+  const nx = advance(G); S.nx = nx;
+  if (nx === 'market') { save(); renderMarket(); return; }
+  G.docket = courtDocket(G, nx === 'end'); save();
+  if (G.docket.length) showSummons(); else afterCourt();
+}
+function afterCourt() {
+  closeDlg();
+  if (S.nx === 'end' || G.phase === 'end') renderEnd(); else renderDayEnd();
+}
+function resumeGame() {
+  S.qRound = -1;
+  if (G.docket && G.docket.length) {
+    S.nx = G.phase === 'end' ? 'end' : 'dayend';
+    if (G.phase === 'dayend') renderDayEnd();
+    showSummons();
+  } else if (G.phase === 'dayend') renderDayEnd(); else if (G.phase === 'end') renderEnd(); else renderMarket();
+}
+
+function showSummons() {
+  const c = G.docket[0], d = G.deals[c.dealId], npc = NPCBY[d.npcId], pnow = G.price[Math.min(G.r, TOTAL_ROUNDS)];
+  const claim = d.defect
+    ? npc.name + ' says the leaf you sold was damaged and that you knew it.'
+    : npc.name + ' says you took advantage of news they did not have. Since your deal the public price has moved to ' + usd2(pnow) + ' a hogshead.';
+  let h = '<div class="label">Summons</div><h2>' + esc(npc.name) + ' v. you</h2><p>' + esc(claim) + '</p><dl class="rec">' +
+    '<dt>The deal</dt><dd>' + (d.role === 'sell' ? 'You bought ' : 'You sold ') + d.qty + ' hogshead' + (d.qty > 1 ? 's' : '') + ' at ' + usd2(d.price) + ', ' + slotLabel(d.round) + '.</dd>' +
+    '<dt>Asked?</dt><dd>' + (d.asked ? (d.ambiguous ? 'Yes, a vague question about the market.' : 'Yes, a direct question.') : 'No. You were not asked anything.') + '</dd>' +
+    '<dt>You said</dt><dd><i>' + esc(d.said) + '</i></dd>' +
+    '<dt>Witness</dt><dd>' + (d.witness ? 'A bystander heard the exchange.' : 'None.') + '</dd>' +
+    '<dt>Jury question</dt><dd><b>Did you say or do anything tending to impose upon ' + esc(npc.name) + '?</b></dd></dl>';
+  if (G.diff === 'learner') h += '<div class="advice"><b>Counsel:</b> ' + rich(!d.defect && d.conduct === 'silent' ? 'You only stayed silent about outside news. Under Laidlaw that is protected.' : 'What you said, or failed to say, will weigh with the jury.') + '</div>';
+  h += '<div class="foot"><button class="btn primary" data-act="jury" data-focus>Put the question to the jury</button></div>';
+  openDlg(h, false);
+}
+
+function showVerdict() {
+  const c = G.docket[0], out = decideCase(G, c.dealId), d = out.d, npc = NPCBY[d.npcId];
+  cue('gavel'); setTimeout(() => cue(out.lost ? 'lose' : 'win'), 450); if (out.lost) G.wary = (G.wary || 0) + 2; else if (d.conduct === 'evasive' || d.conduct === 'lie') G.lucky = (G.lucky || 0) + 1;
+  let why;
+  if (!out.lost) {
+    if (d.conduct === 'silent' && !d.defect) why = 'Silence about outside market news is protected. Nobody asked and you said nothing untrue, so the claim fails, as it would under Laidlaw.';
+    else if (d.conduct === 'declined') why = 'The jury accepted that declining to answer was not imposition. As in Laidlaw, it was a jury question, and this time it went your way.';
+    else if (d.defect) why = 'The jury did not find that you misled the buyer about the leaf. A different jury might have.';
+    else why = 'The jury could have found imposition and did not. You were lucky, because a misleading statement is exactly what the rule does not protect.';
+  } else {
+    why = d.defect ? 'The jury found that hiding or misstating the fault in the goods imposed on the buyer. Laidlaw protects silence about outside market news, and does not reach this.'
+      : 'The jury found that you said or did something tending to impose upon the other party. Laidlaw protects silence, and does not protect that.';
+  }
+  const odds = Math.round(out.p * 100);
+  const h = '<div class="label">Verdict</div><div class="verdict ' + (out.lost ? 'lost' : 'won') + '">' + (out.lost ? 'The jury finds imposition' : 'The jury finds for you') + '</div>' +
+    '<p>' + rich(why) + '</p><dl class="rec"><dt>Odds against you</dt><dd>About ' + odds + ' in 100</dd>' +
+    (out.lost ? '<dt>You pay</dt><dd>' + usd(out.pay) + ' in damages (the other side\'s loss plus ten percent) and ' + usd(out.fees) + ' in costs. Reputation -15.</dd>'
+              : '<dt>You pay</dt><dd>' + usd(out.fees) + ' for your defence.' + (d.conduct === 'silent' && !d.defect ? ' Reputation +2.' : '') + '</dd>') + '</dl>' +
+    '<div class="cite">Laidlaw v. Organ, 15 U.S. (2 Wheat.) 178 (1817)</div><div class="foot"><button class="btn primary" data-act="verdict-next" data-focus>Continue</button></div>';
+  openDlg(h, false);
+}
+
+function renderDayEnd() {
+  const g = G, di = dayOf(g.r - 1), day = DAYS[di], nxt = DAYS[dayOf(g.r)];
+  $('#sub').textContent = day.name + ' evening · the day\'s accounts';
+  const deals = g.deals.filter(d => d.day === di), p0 = g.price[di * 4], p1 = g.price[g.r], nw = g.cash + g.inv * p1;
+  let h = '<section style="padding-block:24px;max-width:900px"><div class="label">End of ' + day.name + '</div><h2 style="font-size:2rem;margin:6px 0 14px">The day\'s accounts</h2>' +
+    '<div class="cols2"><div class="panel"><div class="label">Price of leaf</div><div class="big num">' + usd2(p1) + '</div><div class="muted num">from ' + usd2(p0) + ' at dawn</div></div>' +
+    '<div class="panel"><div class="label">Net worth</div><div class="big num">' + usd(nw) + '</div><div class="muted num">cash ' + usd(g.cash) + ', stock ' + g.inv + ' hogsheads</div></div></div>';
+  if (g.dayNotes.length) h += '<div class="panel" style="margin-top:14px"><h3>Word on the levee</h3>' + g.dayNotes.map(n => '<p>' + esc(n) + '</p>').join('') + '</div>';
+  h += '<div class="panel" style="margin-top:14px"><h3>Your dealings</h3>';
+  if (!deals.length) h += '<p class="muted">You made no deals today.</p>';
+  else h += '<div class="scroll-x"><table class="tbl"><tr><th>When</th><th>With</th><th>Deal</th><th>What you did</th><th>Court</th></tr>' + deals.map(d =>
+    '<tr><td>' + slotLabel(d.round) + '</td><td>' + esc(NPCBY[d.npcId].name) + '</td><td class="num">' + (d.role === 'sell' ? 'Bought ' : 'Sold ') + d.qty + ' at ' + usd2(d.price) + '</td><td>' + esc(d.defect ? 'Faulty goods: ' + CONDUCT[d.conduct].label.toLowerCase() : CONDUCT[d.conduct].label) + '</td><td>' + (d.verdict === 'won' ? 'You won' : d.verdict === 'lost' ? 'You lost' : '') + '</td></tr>').join('') + '</table></div>';
+  h += '</div><div class="foot"><button class="btn primary" data-act="daynext" data-focus>Open the market on ' + nxt.name + '</button></div></section>';
+  screen.innerHTML = h; window.scrollTo(0, 0);
+  const f = screen.querySelector('[data-focus]'); if (f) f.focus();
+}
+
+function renderEnd() {
+  const g = G, f = finalReport(g), c = g.counts; clearSave();
+  $('#sub').textContent = 'Monday evening · final accounts';
+  const ins = [];
+  if (c.lie) ins.push('You lied ' + c.lie + (c.lie > 1 ? ' times' : ' time') + '. That is the one kind of conduct the rule never protects.');
+  if (c.evasive) ins.push('You gave ' + c.evasive + ' misleading or evasive ' + (c.evasive > 1 ? 'answers' : 'answer') + '. The Court warned against saying or doing anything tending to impose on the other side.');
+  if (g.foregone > 0) ins.push('You disclosed when you could have stayed quiet, giving up about ' + usd(g.foregone) + '. The rule lets a buyer keep that advantage. Giving it up was a choice, not a duty.');
+  if ((c.silent + c.declined) > 0 && !c.lie && !c.evasive) ins.push('You stayed silent or declined to answer without misleading anyone. That is the position the Court protected.');
+  if (g.deals.some(d => d.defect && d.conduct !== 'disclosed')) ins.push('You sold faulty leaf without saying so. That is outside Laidlaw, which concerned news from outside the goods.');
+  if (g.lost) ins.push('You lost ' + g.lost + (g.lost > 1 ? ' cases' : ' case') + '. Each one followed a statement or concealment, not a plain silence.');
+  if (!ins.length) ins.push('Little private news changed hands in your game, so the rule hardly came up. Play again to meet it.');
+  let h = '<section style="padding-block:24px;max-width:960px"><div class="label">Final accounts</div><h2 class="big" style="margin:6px 0 4px">' + esc(f.rank) + '</h2>' +
+    '<p class="muted num">Score ' + f.score.toLocaleString('en-US') + ' · ' + DIFF[g.diff].label + '</p>' +
+    '<div class="cols2" style="margin-block:14px"><div class="panel"><div class="stats">' +
+    '<div class="stat"><div class="label">Net worth</div><div class="v">' + usd(f.nw) + '</div></div>' +
+    '<div class="stat"><div class="label">Profit</div><div class="v">' + usd(f.profit) + '</div></div>' +
+    '<div class="stat"><div class="label">Reputation</div><div class="v">' + g.rep + '/100</div></div>' +
+    '<div class="stat"><div class="label">Imposition risk</div><div class="v">' + g.risk + '/100</div></div></div></div>' +
+    '<div class="panel"><div class="stats"><div class="stat"><div class="label">Cases won</div><div class="v">' + g.won + '</div></div><div class="stat"><div class="label">Cases lost</div><div class="v">' + g.lost + '</div></div>' +
+    '<div class="stat"><div class="label">Disclosures</div><div class="v">' + c.disclosed + '</div></div><div class="stat"><div class="label">Lies and evasions</div><div class="v">' + (c.lie + c.evasive) + '</div></div></div></div></div>';
+  if (g.insolvent) h += '<p class="muted">At one point you could not meet a judgment and your stock was sold to cover it.</p>';
+  h += '<div class="panel"><h3>What Organ did, and what the Court held</h3>' +
+    '<p>' + rich('According to the record, there was no evidence that Organ asserted or suggested anything to make Girault believe the news did not exist. The Court held that a [[vendee]] is not bound to communicate [[extrinsic information]] that only he knows and that may affect the price, and that each party must take care not to say or do anything tending to impose upon the other. Whether any [[imposition]] was practised was a question for the jury, so the judge was wrong to direct the verdict and the case went back for a new trial.') + '</p>' +
+    '<h3>Where you stood</h3><ul>' + ins.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul></div>';
+  h += endExtras(g, f);
+  h += '<div class="panel" style="margin-top:14px"><h3>Your decisions</h3>';
+  if (!g.deals.length) h += '<p class="muted">You made no deals.</p>';
+  else h += '<div class="scroll-x"><table class="tbl"><tr><th>When</th><th>With</th><th>Deal</th><th>What you did</th><th>Court</th></tr>' + g.deals.map(d =>
+    '<tr><td>' + slotLabel(d.round) + '</td><td>' + esc(NPCBY[d.npcId].name) + '</td><td class="num">' + (d.role === 'sell' ? 'Bought ' : 'Sold ') + d.qty + ' at ' + usd2(d.price) + '</td><td>' + esc(d.defect ? 'Faulty goods: ' + CONDUCT[d.conduct].label.toLowerCase() : CONDUCT[d.conduct].label) + '</td><td>' + (d.verdict === 'won' ? 'Won' : d.verdict === 'lost' ? 'Lost' : '') + '</td></tr>').join('') + '</table></div>';
+  h += '</div><div class="foot"><button class="btn primary" data-act="again" data-focus>Play again</button><button class="btn" data-act="thennow">Then vs. now</button></div></section>';
+  screen.innerHTML = h; window.scrollTo(0, 0);
+}
+
+/* ---------- v2 systems: portraits, cues, daily/class seeds, share card, archetypes, achievements ---------- */
+/* Original SVG portraits: skin, coat and hat come from a hash of the character id; mood changes brows and mouth. */
+function portrait(npc, mood, slot) {
+  let h = 0; for (const c of npc.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const skin = ['#f1c9a5', '#d9a074', '#a8744f', '#7a4f35'][h % 4], coat = ['#6b3b2e', '#2f4a5e', '#4a5a2f', '#5e3a5e', '#3a3a3a'][(h >> 3) % 5], hat = (h >> 6) % 3;
+  const sky = ['#f0c987', '#f7e8b8', '#e8b86a', '#5b4a7a'][slot];
+  const brow = mood === 'suspicious' ? 'M38 44l14 4M82 44l-14 4' : mood === 'hopeful' ? 'M38 47l14-4M82 47l-14-4' : 'M38 45h14M68 45h14';
+  const mouth = mood === 'suspicious' ? 'M48 79q12-6 24 0' : mood === 'hopeful' ? 'M46 74q14 10 28 0' : 'M48 77h24';
+  const top = hat === 1 ? '<rect x="36" y="6" width="48" height="24" fill="' + coat + '"/><rect x="28" y="28" width="64" height="6" fill="' + coat + '"/>' : hat === 2 ? '<path d="M30 48q0-34 30-34t30 34q-8-12-30-12t-30 12z" fill="' + coat + '"/>' : '<path d="M32 50q0-30 28-30t28 30q-10-14-28-14t-28 14z" fill="#3a2a1e"/>';
+  return '<svg class="portrait arrive" viewBox="0 0 120 120" role="img" aria-label="Portrait of ' + esc(npc.name) + ', looking ' + mood + '"><rect width="120" height="120" fill="' + sky + '"/><path d="M10 120q0-34 50-34t50 34z" fill="' + coat + '"/><ellipse cx="60" cy="58" rx="28" ry="32" fill="' + skin + '"/>' + top + '<circle cx="48" cy="57" r="3" fill="#241c14"/><circle cx="72" cy="57" r="3" fill="#241c14"/><path d="' + brow + '" stroke="#241c14" stroke-width="3" fill="none"/><path d="' + mouth + '" stroke="#241c14" stroke-width="3" fill="none"/></svg>';
+}
+const CUES = { trade: [440, 587, 740], warn: [196, 175], gavel: [130, 98], win: [523, 659, 784], lose: [220, 165] };
+const HAP = { trade: [20], warn: [60, 40, 60], gavel: [80], win: [30, 30, 30], lose: [200] };
+function cue(n) { beep(CUES[n], 0.12); if (S.haptics && navigator.vibrate) { try { navigator.vibrate(HAP[n]); } catch (e) { /* ignore */ } } }
+function setHaptics(on) {
+  S.haptics = on; const b = $('#hapBtn'); b.setAttribute('aria-pressed', on); b.textContent = on ? 'Haptics on' : 'Haptics off';
+  try { localStorage.setItem('nom1815.hap', on ? '1' : '0'); } catch (e) { /* ignore */ }
+  if (on && navigator.vibrate) navigator.vibrate(30);
+}
+const dayStr = () => new Date().toISOString().slice(0, 10);
+const dailySeed = () => (+dayStr().replace(/-/g, '') * 2654435761) >>> 0;
+const repLetter = r => r >= 85 ? 'A' : r >= 70 ? 'B' : r >= 50 ? 'C' : r >= 30 ? 'D' : 'E';
+const MOVE = { disclosed: 'D', silent: 'S', declined: 'S', evasive: 'E', lie: 'L', plain: 'T' };
+const MOJI = { D: '\u{1F7E9}', S: '\u2B1C', E: '\u{1F7E8}', L: '\u{1F7E5}', T: '\u{1F7E6}', P: '\u2B1B' };
+const moves = g => { const m = Array(TOTAL_ROUNDS).fill('P'); g.history.forEach(h => { m[h.round] = MOVE[h.conduct] || 'T'; }); return m.join(''); };
+const ARCH = {
+  honest: ['Honest Broker', 'You told the truth and still came out ahead.', 'Nothing you said could have imposed on anyone. Laidlaw would not have troubled you.'],
+  loyal: ['Laidlaw Loyalist', 'You kept your counsel and your word.', 'Silence about outside market news is protected. You never crossed into misleading speech.'],
+  sharp: ['Sharp Operator', 'Profitable, and living on borrowed luck.', 'Your gains rested on answers a jury could call imposition. This time it did not catch you.'],
+  pauper: ['Principled Pauper', 'Clean hands, thin purse.', 'You broke no rule, though the rule never asked you to give up so much. Silence was allowed.'],
+  tale: ['Cautionary Tale', 'The levee will talk about you for years.', 'Lies, misleading answers and lost cases are what the Court said it would not protect.']
+};
+function archetype(g, f) {
+  const c = g.counts, bad = c.lie + c.evasive;
+  if (c.lie >= 3 || (g.lost >= 2 && bad)) return 'tale';
+  if (f.profit > 0 && !bad) return c.disclosed >= c.silent + c.declined ? 'honest' : 'loyal';
+  if (f.profit > 0 && g.lost === 0) return 'sharp';
+  if (!bad) return 'pauper';
+  return 'tale';
+}
+const ACH = [
+  ['Open for business', 'Make your first deal.', (g) => g.deals.length > 0],
+  ['Clean hands', 'Profit with no lies or evasions.', (g, f) => f.profit > 0 && !g.counts.lie && !g.counts.evasive],
+  ['Lucky jury', 'Win a case after an evasive answer or a lie.', (g) => g.lucky > 0],
+  ['Never sued', 'Finish in profit without a lawsuit.', (g, f) => f.profit > 0 && g.won + g.lost === 0],
+  ['Generous soul', 'Disclose news three times.', (g) => g.counts.disclosed >= 3],
+  ['Ironclad silence', 'Stay silent three times and lose no case.', (g) => g.counts.silent + g.counts.declined >= 3 && g.lost === 0],
+  ['Fault finder', 'Admit a defect in your goods.', (g) => g.deals.some(d => d.defect && d.conduct === 'disclosed')],
+  ['Steady nerve', 'Pass three times.', (g) => g.passed >= 3],
+  ['Good name', 'Finish with reputation 90 or more.', (g) => g.rep >= 90],
+  ['Big week', 'Profit of $2,000 or more.', (g, f) => f.profit >= 2000],
+  ['Daily regular', 'Finish a daily challenge.', (g) => g.mode === 'daily']
+];
+function endExtras(g, f) {
+  const a = ARCH[archetype(g, f)], c = g.counts, mv = moves(g), code = (g.seed >>> 0).toString(36).toUpperCase();
+  let have = []; try { have = JSON.parse(localStorage.getItem('nom1815.ach') || '[]'); } catch (e) {}
+  const now = ACH.filter(x => x[2](g, f)).map(x => x[0]), fresh = now.filter(n => !have.includes(n));
+  try { localStorage.setItem('nom1815.ach', JSON.stringify([...new Set([...have, ...now])])); if (g.mode === 'daily') localStorage.setItem('nom1815.daily', dayStr()); } catch (e) {}
+  const label = g.mode === 'daily' ? 'Daily ' + dayStr() : 'Code ' + code;
+  const card = 'New Orleans Market 1815 \u00B7 ' + label + ' \u00B7 Profit ' + usd(f.profit) + ' \u00B7 Reputation ' + repLetter(g.rep) + ' \u00B7 ' + (c.lie) + ' lies \u00B7 ' + g.lost + ' ' + (g.lost === 1 ? 'case' : 'cases') + ' lost\n' + mv.split('').map(x => MOJI[x]).join('') + '\n' + [...mv].filter(x => x !== 'P').length + ' deals';
+  const rc = 'NOM|' + code + '|' + Math.round(f.profit) + '|' + g.rep + '|' + g.lost + '|' + mv;
+  return '<div class="panel" style="margin-top:14px"><div class="label">Your ending</div><h3>' + a[0] + '</h3><p><i>' + esc(a[1]) + '</i></p><p>' + esc(a[2]) + '</p></div>' +
+    '<div class="panel" style="margin-top:14px"><h3>Achievements</h3><ul>' + ACH.map(x => '<li class="' + (now.includes(x[0]) ? '' : 'muted') + '">' + (now.includes(x[0]) ? '\u2605 ' : '\u2606 ') + '<b>' + x[0] + '</b>' + (fresh.includes(x[0]) ? ' (new)' : '') + ': ' + x[1] + '</li>').join('') + '</ul></div>' +
+    '<div class="panel" style="margin-top:14px"><h3>Share</h3><textarea id="cardTx" class="card" readonly aria-label="Result card">' + esc(card) + '</textarea><p class="muted">Result code for a class comparison:</p><input class="mono" readonly value="' + rc + '" style="width:100%" aria-label="Result code"><div class="foot"><button class="btn" id="copyBtn" data-act="copycard">Copy card</button></div></div>';
+}
+function compareHTML(txt) {
+  const rows = txt.split('\n').map(l => l.trim().split('|')).filter(p => p[0] === 'NOM' && p.length >= 6 && p[5].length === TOTAL_ROUNDS);
+  if (!rows.length) return '<p class="muted">No valid result codes found.</p>';
+  const avg = i => Math.round(rows.reduce((s, p) => s + (+p[i] || 0), 0) / rows.length);
+  let h = '<p><b>' + rows.length + '</b> students · average profit ' + usd(avg(2)) + ' · average reputation ' + avg(3) + ' · average cases lost ' + (rows.reduce((s, p) => s + (+p[4] || 0), 0) / rows.length).toFixed(1) + '</p><div class="scroll-x"><table class="tbl"><tr><th>Round</th><th>Disclosed</th><th>Silent</th><th>Evasive</th><th>Lied</th><th>Passed</th></tr>';
+  for (let i = 0; i < TOTAL_ROUNDS; i++) { const n = ch => rows.filter(p => p[5][i] === ch).length; h += '<tr><td>' + slotLabel(i) + '</td><td>' + n('D') + '</td><td>' + n('S') + '</td><td>' + n('E') + '</td><td>' + n('L') + '</td><td>' + n('P') + '</td></tr>'; }
+  return h + '</table></div>';
+}
+/* ---------- actions and events ---------- */
+function adjustQty(d) { if (!G || G.phase !== 'market' || !G.enc || G.enc.kind === 'idle') return; S.qty = clamp(S.qty + d, 1, G.enc.max); renderMarket(); }
+function setSound(on) {
+  S.sound = on; const b = $('#soundBtn'); b.setAttribute('aria-pressed', on); b.textContent = on ? 'Sound on' : 'Sound off';
+  try { localStorage.setItem('nom1815.sound', on ? '1' : '0'); } catch (e) { /* ignore */ }
+  if (on) beep([440, 660]);
+}
+const ACT = {
+  diff: el => { S.diff = el.dataset.v; showTitle(); const b = screen.querySelector('.diff[aria-checked="true"]'); if (b) b.focus(); },
+  tutorial: () => { S.tut = 0; S.tutPick = null; S.quizPick = null; renderTutorial(); },
+  tutpick: el => { S.tutPick = el.dataset.v; beep([392, 523]); renderTutorial(); },
+  quiz: el => { S.quizPick = el.dataset.v; renderTutorial(); },
+  tutnext: () => { S.tut++; renderTutorial(); window.scrollTo(0, 0); },
+  begin: () => { closeDlg(); clearSave(); G = newGame(S.diff); S.qRound = -1; save(); renderMarket(); },
+  resume: () => { G = load(); if (G) { RS = G.rs || 1; resumeGame(); } else showTitle(); },
+  title: () => showTitle(),
+  again: () => showTitle(),
+  howto: () => showHowTo(), thennow: () => showThenNow(), close: () => closeDlg(),
+  sound: () => setSound(!S.sound),
+  haptics: () => setHaptics(!S.haptics),
+  daily: () => {
+    const ds = dayStr(); let done = false; try { done = localStorage.getItem('nom1815.daily') === ds; } catch (e) {}
+    if (done) { openDlg('<h2>Daily challenge complete</h2><p>You have played today\'s market. Come back tomorrow, or try free play or a class code.</p><div class="foot"><button class="btn primary" data-act="close" data-focus>Close</button></div>', true); return; }
+    closeDlg(); clearSave(); G = newGame(S.diff, dailySeed(), 'daily'); S.qRound = -1; save(); renderMarket();
+  },
+  seedplay: () => {
+    const n = parseInt(($('#seedIn').value || '').trim(), 36); if (!n) { $('#seedIn').focus(); return; }
+    clearSave(); G = newGame(S.diff, n, 'class'); S.qRound = -1; save(); renderMarket();
+  },
+  mkcode: () => { const c = (((Math.random() * 1e9) >>> 0) + 1).toString(36).toUpperCase(); openDlg('<h2>Class code</h2><p>Give students this code. They type it under "Play code" on the title screen and all face the same market.</p><p class="mono" style="font-size:2rem">' + c + '</p><p class="muted">Afterwards, collect their result codes (shown on the final screen) and paste them into Class comparison.</p><div class="foot"><button class="btn primary" data-act="close" data-focus>Close</button></div>', true); },
+  classcmp: () => openDlg('<h2>Class comparison</h2><p>Paste one result code per line.</p><textarea id="cmpIn" class="card" aria-label="Result codes"></textarea><div class="foot"><button class="btn primary" data-act="cmpgo">Compare</button><button class="btn ghost" data-act="close">Close</button></div><div id="cmpOut"></div>', true),
+  cmpgo: () => { $('#cmpOut').innerHTML = compareHTML($('#cmpIn').value); },
+  copycard: () => { const t = $('#cardTx'); const txt = t.value; const done = () => { $('#copyBtn').textContent = 'Copied'; }; const fb = () => { t.select(); $('#copyBtn').textContent = 'Select and copy'; };
+    try { if (navigator.share) navigator.share({ text: txt }).catch(fb); else navigator.clipboard.writeText(txt).then(done, fb); } catch (e) { fb(); } },
+  qty: el => adjustQty(+el.dataset.d),
+  advice: () => {
+    const d = DIFF[G.diff]; if (G.cash < d.adviceCost || G.adviceUsed >= d.adviceMax) return;
+    G.cash = r2(G.cash - d.adviceCost); G.adviceUsed++; S.adviceOpen = true; save(); renderMarket();
+  },
+  resp: el => {
+    if (!G || G.phase !== 'market') return;
+    const res = respond(G, el.dataset.c, S.qty); save(); if (!res.pass) cue(res.conduct === 'lie' || res.conduct === 'evasive' ? 'warn' : 'trade');
+    showNote(res);
+  },
+  idle: () => { respond(G, 'pass', 0); proceed(); },
+  'note-next': () => proceed(),
+  jury: () => showVerdict(),
+  'verdict-next': () => { G.docket.shift(); save(); if (G.docket.length) showSummons(); else afterCourt(); },
+  daynext: () => { startNextDay(G); S.qRound = -1; save(); renderMarket(); }
+};
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (t && !t.disabled && ACT[t.dataset.act]) ACT[t.dataset.act](t);
+  const term = e.target.closest('.term');
+  if (term) showTip(term); else hideTip();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !veil.hidden && S.closable) { closeDlg(); return; }
+  if (e.key === 'Tab' && !veil.hidden) {
+    const f = [...veil.querySelectorAll('button:not([disabled]),[tabindex="0"]')];
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    return;
+  }
+  if (!veil.hidden || !G || G.phase !== 'market' || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (/^[1-4]$/.test(k)) { const b = screen.querySelectorAll('[data-act="resp"]:not([data-c="pass"])')[+k - 1]; if (b) b.click(); }
+  else if (k === 'p') { const b = screen.querySelector('[data-c="pass"]'); if (b) b.click(); }
+  else if (k === '+' || k === '=') adjustQty(1);
+  else if (k === '-') adjustQty(-1);
+});
+
+/* ---------- boot ---------- */
+try { S.sound = localStorage.getItem('nom1815.sound') === '1'; } catch (e) { S.sound = false; }
+const sb = $('#soundBtn'); sb.setAttribute('aria-pressed', S.sound); sb.textContent = S.sound ? 'Sound on' : 'Sound off';
+try { S.haptics = localStorage.getItem('nom1815.hap') === '1'; } catch (e) { S.haptics = false; }
+if (navigator.vibrate) { const hb = $('#hapBtn'); hb.hidden = false; hb.setAttribute('aria-pressed', S.haptics); hb.textContent = S.haptics ? 'Haptics on' : 'Haptics off'; }
+showTitle();
+})();
+</script>
+</body></html>
